@@ -174,3 +174,14 @@ def edit_profile():
             return redirect('users/edit.html', form=form)
 
     return render_template("edit_user.html", form=form)
+
+# @app.route('/users', methods=["GET", "POST"])
+# def show_users():
+#     """List page of users"""
+#     if not g.user:
+#         flash("Please login or create an account to view users.", "danger")
+#         return redirect("/")
+
+#     users = User.query.all()
+
+#     return render_template("list_users.html", users=users)
