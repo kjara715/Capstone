@@ -12,6 +12,7 @@
     <script src="https://unpkg.com/bootstrap"></script>
     <script src="https://kit.fontawesome.com/d9cb900708.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
 </head>
 <body>
@@ -30,16 +31,16 @@
               {% else %}
                 <li>
                     <a class="nav-link" href="/users/{{ g.user.id }}">
-                        <img id="profile-img" src="{{ g.user.profile_img }}" alt="{{ g.user.username }} class="img-responsive">
+                        <img id="profile-img" src="{{ g.user.profile_img }}" alt="{{ g.user.username }}" class="img-responsive">
                     </a>
                 </li>
-                <li><a class="nav-link" href="/messages/new">New Review</a></li>
+                <li><a class="nav-link" href="/reviews/new">New Review <i class="fas fa-pen-square"></i></a></li>
                 <li><a class="nav-link" href="/users">Discover Users</a></li>
                 <li><a class="nav-link" href="/logout">Log out</a></li>
                 {% endif %}
             </ul>
-            <form class="d-flex">
-              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <form class="d-flex" action="/search" method="POST">
+              <input class="form-control me-2" type="search" placeholder="Search for a cocktail" aria-label="Search" name="search">
               <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
           </div>
@@ -57,7 +58,9 @@
       </div>
 
 
+      
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 
-    
+      <script src="/static/app.js"></script>  
 </body>
 </html>

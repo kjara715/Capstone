@@ -24,6 +24,13 @@ class ReviewForm(FlaskForm):
     review = StringField("Review") 
     image=StringField("Image URL")
 
+class EditReviewForm(FlaskForm):
+    
+    rating = FloatField("Rating")
+    review = StringField("Review") 
+    image=StringField("Image URL")
+    
+
 class UserEditForm(FlaskForm):
     """Form for editing user-info"""
 
@@ -33,3 +40,8 @@ class UserEditForm(FlaskForm):
     banner_img = StringField('Banner Image')
     bio=StringField('Bio')
     password=PasswordField('Password',  validators=[DataRequired()])
+
+class CommentForm(FlaskForm):
+    """Form to comment on users' reviews"""
+
+    text=StringField('Comment', validators=[DataRequired()]) #how to add a text limit validator?

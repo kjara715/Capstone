@@ -1,12 +1,14 @@
 import os
+import requests
 
+from jinja2 import Template
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
-from forms import SignUp, LoginForm, ReviewForm, UserEditForm
+from forms import SignUp, LoginForm, ReviewForm, UserEditForm, CommentForm, EditReviewForm
 
-from models import User, Review, Drink, Saved_recipe, Likes, Follows, db, connect_db
+from models import User, Review, Drink, Saved_recipe, Likes, Follows, Comment, db, connect_db
 
 CURR_USER_KEY = "curr_user"
 
@@ -54,7 +56,74 @@ def do_logout():
 @app.route('/')
 def home_page():
 
+    if g.user:
+        reviews = (Review
+                    .query
+                    .filter(or_(Review.user_id.in_([ user.id for user in g.user.following]), Review.user_id==g.user.id))
+                    .order_by(Review.timestamp.desc())
+                    .limit(100)
+                    .all())
+        
+        # get all the likes with g.user.id=user_id and get the reviews_id's from this
+        likes=Likes.query.with_entities(Likes.reviews_id).filter(Likes.user_id == g.user.id).all()
+
+        result = [] 
+
+        # turn likes (list of tuples) into just a list
+        for t in likes: 
+            for x in t: 
+                result.append(x)
+
+        #comment=Comment(user_id=g.user.id, reviews_id=review_id, text=form.text.data)
+
+        # comments=Comment.query.with_entities(Comment.reviews_id).all()
+        comments=Comment.query.all()
+
+        form=CommentForm() 
+           
+        return render_template('home.html', reviews=reviews, likes=result, form=form, comments=comments)
+
     return render_template("home.html")
+
+@app.route('/search', methods=["POST"])
+def search_drink():
+    """Searches api for """
+
+    search_term=request.form["search"]
+
+    resp=requests.get(f"https://www.thecocktaildb.com/api/json/v1/1/search.php",
+                        params={"s": search_term}
+        )
+
+    details=resp.json() #converts to python dictionary
+
+    
+
+    my_drinks=details["drinks"] #gives list of drinks
+    my_drinks_reduced=[]
+    for item in my_drinks: #each dict of different drink, item=1 drink
+        drink_dict={"strDrink": item["strDrink"],
+                      "strDrinkThumb": item["strDrinkThumb"],
+                    "strInstructions": item["strInstructions"]}
+  
+        for key in item:
+            if item[key]:
+      #this keeps getting mutated :( 
+                all_ingredients=[]
+                for number in range(1,16):
+                    if item[f"strMeasure{number}"] and item[f"strIngredient{number}"]:
+                        x=item[f"strMeasure{number}"]
+                        y=item[f"strIngredient{number}"]
+                        combined=x + ' '+ y
+                        all_ingredients.append(combined)
+                    elif item[f"strIngredient{number}"]:
+                        y=item[f"strIngredient{number}"]
+                        all_ingredients.append(y)
+   
+        drink_dict["ingredient_list"]=all_ingredients
+        my_drinks_reduced.append(drink_dict)
+
+    return render_template("drink_details.html", drink_list=my_drinks_reduced, search_term=search_term)
 
 @app.route('/register', methods=["GET", "POST"])
 def register_user():
@@ -175,13 +244,305 @@ def edit_profile():
 
     return render_template("edit_user.html", form=form)
 
-# @app.route('/users', methods=["GET", "POST"])
-# def show_users():
-#     """List page of users"""
-#     if not g.user:
-#         flash("Please login or create an account to view users.", "danger")
-#         return redirect("/")
+@app.route('/users', methods=["GET", "POST"])
+def show_users():
+    """List page of users"""
+    if not g.user:
+        flash("Please login or create an account to view users.", "danger")
+        return redirect("/")
 
-#     users = User.query.all()
+    users = User.query.all()
 
-#     return render_template("list_users.html", users=users)
+    return render_template("list_users.html", users=users)
+
+@app.route('/users/follow/<int:user_id>', methods=["POST"])
+def follow_user(user_id):
+    """Follow user"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    follow = User.query.get_or_404(user_id)
+    g.user.following.append(follow)
+    db.session.commit()
+
+    flash(f"You are now following {follow.username}", "success")
+    return redirect("/users")
+
+@app.route('/users/stop-following/<int:user_id>', methods=['POST'])
+def stop_following(user_id):
+    """Have currently-logged-in-user stop following this user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    followed_user = User.query.get(user_id)
+    g.user.following.remove(followed_user)
+    flash(f"You have unfollowed {followed_user.username}", "primary")
+    db.session.commit()
+
+    return redirect(f"/users/{g.user.id}/following")
+
+@app.route('/save', methods=["POST"])
+def save_recipe():
+    """Adds the drink to the db, if not there currently and then saves the recipe for the user"""
+    if not g.user:
+        flash('You must be logged into an account to save a recipe', 'danger')
+        return redirect('/')
+
+    name=request.form["name"]
+    ingredients=request.form["ingredients"] 
+    instructions=request.form["instructions"]
+    image=request.form["image"]
+
+    #if the drink is already in the db
+    if Drink.query.filter_by(name=name).first():
+        drink=Drink.query.filter_by(name=name).first()
+    
+    #if the drink is not saved as an instance of Drink in the db
+    else:
+        drink=Drink(name=name, ingredients=ingredients, instructions=instructions, image=image)
+        db.session.add(drink)
+        db.session.commit()
+
+    if Saved_recipe.query.filter_by(user_id=g.user.id, drink_id=drink.id).all():
+        flash(f"You have already saved the recipe for {drink.name}", "danger")
+        return redirect('/')
+        
+
+    #now make the drink a saved recipe for the user
+    saved=Saved_recipe(drink_id=drink.id, user_id=g.user.id)
+    db.session.add(saved)
+    db.session.commit()
+
+    #on the saved page, we want ALL of the particular user's saved recipes to 
+    return redirect(f"/users/{g.user.id}/saved") #might not want to jump right to the page
+
+@app.route('/users/<int:user_id>/saved')
+def show_saved_recipe(user_id):
+    """shows page on user profile of all saved recipes"""
+    user_drinks=g.user.saved_recipes
+
+    # all_ingredients_list=[]
+    # for one_drink in user_drinks:
+    #     ingredients=one_drink.drink.ingredients
+    #     ingredients_list=ingredients.split(",")
+    #     all_ingredients_list
+  
+    return render_template("saved_recipes.html", user_drinks=user_drinks) 
+
+
+
+@app.route('/users/<int:user_id>/following')
+def show_following(user_id):
+    """Show list of people this user is following."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+    return render_template('following.html', user=user)
+
+
+@app.route('/users/<int:user_id>/followers')
+def users_followers(user_id):
+    """Show list of followers of this user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+    return render_template('followers.html', user=user)
+
+@app.route('/delete/<int:drink_id>', methods=["POST"])
+def delete_saved(drink_id):
+    """Remove a drink from a user's saved drinks"""
+    #need to obtain the drin_id from the template!
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+     #logic to unlike if the liked message is already an instance of the Likes class
+    if Saved_recipe.query.filter_by(user_id=g.user.id, drink_id=drink_id).all():
+        saved_recipe=Saved_recipe.query.filter_by(user_id=g.user.id, drink_id=drink_id).one()
+        db.session.delete(saved_recipe)
+        db.session.commit()
+        return redirect(f'/users/{g.user.id}/saved')
+
+    return redirect('/')
+
+@app.route('/reviews/new', methods=["GET", "POST"])
+def make_review():
+    """Displays form to write a new review and processes the form"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form = ReviewForm()
+    
+    if form.validate_on_submit():
+
+        if form.image.data:
+            display_img=form.image.data
+        else:
+            display_img="https://banner2.cleanpng.com/20190714/uvh/kisspng-martini-cocktail-glass-clip-art-vector-graphics-home-forty-two-peterborough-5d2b093a9f6130.8579484215631014986528.jpg"
+
+        drink = Drink.query.filter_by(name=form.drink_name.data).one()
+        review = Review(
+            drink_id= drink.id,
+            rating=round(float(form.rating.data),2),
+            review=form.review.data,
+            image=display_img,
+            user_id=g.user.id
+        )
+        
+        db.session.add(review)    
+        db.session.commit()
+
+        return redirect("/")
+
+        #Review.image.default.arg
+
+    return render_template('review.html', form=form)
+
+@app.route('/users/add_like/<int:review_id>', methods=["POST"])
+def like_message(review_id):
+    """Like/"cheers" a message."""
+
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    #prevent user from liking their own message
+    # m = Message.query.get(message_id)
+    # if m in g.user.messages:
+    #     flash("You cannot like your own message.", "danger")
+    #     return redirect ("/")
+    
+    #logic to unlike if the liked message is already an instance of the Likes class
+    if Likes.query.filter_by(user_id=g.user.id, reviews_id=review_id).all():
+        liked_msg=Likes.query.filter_by(user_id=g.user.id, reviews_id=review_id).one()
+        db.session.delete(liked_msg)
+        db.session.commit()
+        return redirect('/')
+
+    #like the message otherwise
+    liked_msg=Likes(user_id=g.user.id, reviews_id=review_id)
+    db.session.add(liked_msg)
+    db.session.commit()
+
+    return redirect("/")
+
+@app.route('/users/<int:user_id>/likes') #not using yet...
+def show_likes(user_id):
+    """Show list of likes"""
+    likes=g.user.likes
+
+@app.route('/users/comment/<int:review_id>', methods=["POST"])
+def comment(review_id):
+    """Comment on a user's post"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form=CommentForm()
+    
+    
+    comment=Comment(user_id=g.user.id, reviews_id=review_id, text=form.text.data)
+    db.session.add(comment)
+    db.session.commit()
+
+    return redirect("/")
+
+@app.route('/users/delete/<int:review_id>', methods=["POST"])
+def delete_review(review_id):
+    
+    if not g.user:
+        flash("Access denied", "danger")
+        return redirect('/')
+
+    delete_me=Review.query.get_or_404(review_id)
+
+    if delete_me.user_id != g.user.id:
+        flash("You are not allowed to delete another user's post", 'danger')
+        redirect('/')
+
+    flash(f"Your review of {delete_me.drink.name} has been deleted", 'success')
+    db.session.delete(delete_me)
+    db.session.commit()
+    return redirect('/')
+
+@app.route('/users/edit/<int:review_id>', methods=["GET","POST"])
+def edit_review(review_id):
+    """Returns and processess form to edit a review"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    review=Review.query.get(review_id)
+    form=EditReviewForm(obj=review)
+    drink_name=review.drink.name
+
+    if form.image.data:
+            display_img=form.image.data
+    else:
+            display_img="https://banner2.cleanpng.com/20190714/uvh/kisspng-martini-cocktail-glass-clip-art-vector-graphics-home-forty-two-peterborough-5d2b093a9f6130.8579484215631014986528.jpg"
+    
+    if form.validate_on_submit():
+           
+
+            review.rating=form.rating.data 
+            review.review=form.review.data 
+            review.image=display_img
+            
+            db.session.commit()
+
+            flash("Your changes have been saved", 'success')
+
+            return redirect("/")
+
+
+    return render_template("edit_review.html", form=form, drink=drink_name)
+
+@app.route('/reviews/<int:saved_drink_id>', methods=["GET", "POST"])
+def review_for(saved_drink_id):
+    """Returns and processes form to make a review for a drink"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form = EditReviewForm()
+
+    saved_drink=Saved_recipe.query.get(saved_drink_id)
+    
+    if form.validate_on_submit():
+
+        if form.image.data:
+            display_img=form.image.data
+        else:
+            display_img="https://banner2.cleanpng.com/20190714/uvh/kisspng-martini-cocktail-glass-clip-art-vector-graphics-home-forty-two-peterborough-5d2b093a9f6130.8579484215631014986528.jpg"
+
+        review = Review(
+            drink_id= saved_drink.drink.id,
+            rating=round(float(form.rating.data),2),
+            review=form.review.data,
+            image=display_img,
+            user_id=g.user.id
+        )
+        
+        db.session.add(review)    
+        db.session.commit()
+
+        return redirect("/")
+
+    return render_template("single_review.html", saved_drink=saved_drink, form=form)
+
+
+
+
+

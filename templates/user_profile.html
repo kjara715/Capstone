@@ -35,7 +35,7 @@
               {% if g.user.id == user.id %}
               <li class="stat">
                 <p class="small">My Saved Recipes</p>
-                <h4><a href="/users/{{user.id}}/likes">{{user.saved_recipes | length}}</a></h4>
+                <h4><a href="/users/{{user.id}}/saved">{{user.saved_recipes | length}}</a></h4>
               </li>
               <a href="/users/edit" class="btn btn-outline-secondary">Edit Profile</a>
               <form method="POST" action="/users/delete" class="form-inline">
@@ -83,7 +83,8 @@
           <div class="review-area">
             <a href="/users/{{ user.id }}">@{{ user.username }}</a>
             <span class="text-muted">{{ review.timestamp.strftime('%d %B %Y') }}</span>
-            <p>{{ message.text }}</p>
+            <p>{{review.rating}}</p>
+            <p>{{ review.review }}</p>
           </div>
         </li>
 

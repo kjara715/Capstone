@@ -57,6 +57,37 @@ class Likes(db.Model):
         nullable=False
     )
 
+
+class Comment(db.Model):
+    """Comment for reviews"""
+
+    __tablename__='comments'
+
+    id=db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    user_id=db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False
+    )
+
+    user=db.relationship('User')
+
+    reviews_id=db.Column(
+        db.Integer,
+        db.ForeignKey('reviews.id', ondelete='CASCADE'),
+        nullable=False
+    )
+
+    text=db.Column(
+        db.String(120),
+        nullable=False
+    )
+
 class User(db.Model):
     """User in the system."""
 
@@ -93,12 +124,13 @@ class User(db.Model):
 
     profile_img = db.Column(
         db.Text,
-        default="/static/images/default-pic.png",
+        default="https://sumaleeboxinggym.com/wp-content/uploads/2018/06/Generic-Profile-1600x1600.png",
     )
 
     banner_img = db.Column(
         db.Text,
-        default="/static/images/warbler-hero.jpg"
+        default="https://static.tumblr.com/h43vzfd/QGnn84h8n/elusive_pineapples.png"
+        #add a default
     )
     
 
@@ -122,6 +154,12 @@ class User(db.Model):
         'Review',
         secondary="likes",
         primaryjoin=(Likes.user_id == id))
+
+    comments = db.relationship(
+        'Review',
+        secondary="comments",
+        primaryjoin=(Comment.user_id == id),
+        )
     
 
     def __repr__(self):
@@ -198,7 +236,7 @@ class Review(db.Model):
     drink = db.relationship('Drink')
 
     rating = db.Column(
-        db.Integer,
+        db.Float(precision=3),
         nullable = False
     )
 
@@ -219,6 +257,11 @@ class Review(db.Model):
     )
 
     user = db.relationship('User')
+
+    image=db.Column(
+        db.String,
+
+    )
 
 class Drink(db.Model):
     """Drink recipe model"""
@@ -245,7 +288,8 @@ class Drink(db.Model):
     )
 
     image=db.Column(
-        db.String
+        db.Text,
+        default="https://banner2.cleanpng.com/20190714/uvh/kisspng-martini-cocktail-glass-clip-art-vector-graphics-home-forty-two-peterborough-5d2b093a9f6130.8579484215631014986528.jpg"
     )
 
 

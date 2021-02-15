@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit User{% endblock %}
+{% block title %}Single Review{% endblock %}
 {% block content %}
 
 <div class="row justify-content-md-center">
-    <div class="col-md-4">
-      <h2 class="join-message">Edit Your Profile</h2>
+    <div class="col-md-6">
+      <h2 class="join-message">Write your review for <b>{{saved_drink.drink.name}}</b></h2>
       <form method="POST" id="user_form">
         {{ form.hidden_tag() }}
 
@@ -17,18 +17,8 @@
           {{ field(class="form-control") }}
         {% endfor %}
 
-        <p>To confirm changes, enter your password:</p>
-        {% if form.password.errors %}
-          {% for error in form.password.errors %}
-            <span class="text-danger">
-            {{ error }}
-          </span>
-          {% endfor %}
-        {% endif %}
-        {{ form.password(placeholder="Enter your password to confirm", class="form-control") }}
-
-        <div class="edit-btn-area">
-          <button class="btn btn-success">Save Changes</button>
+        <div>
+          <button class="btn btn-success">Post Review</button>
           <a href="/" class="btn btn-outline-secondary">Cancel</a>
         </div>
       </form>

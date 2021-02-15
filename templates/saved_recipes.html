@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Recipes{% endblock %}
+{% block content %}
+<h1>My Saved Recipes</h1>
+{% if not user_drinks %}
+<p>You do not currently have any saved recipes</p>
+{% endif %}
+{% for saved_drink in user_drinks %}
+<div class="card" style="width: 22rem;">
+    <img class="card-img-top" src="{{saved_drink.drink.image}}" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">{{saved_drink.drink.name}}</h5>
+      <h6 class="card-text">Ingredients:</h6>
+      <ul class="card-text"> 
+        {% set list= saved_drink.drink.ingredients.replace('[', '').replace(']', '').replace("'",'').split(',') %}
+        {% for ingredient in list %}
+        <li class="ingredients">{{ingredient}}</li>
+        {% endfor %} 
+      </ul>
+      <h6 class="card-text">Instructions:</h6>
+      <p  class="card-text">{{saved_drink.drink.instructions}}</p>
+      <a href="#" class="btn btn-secondary recipe">View Recipe</a> 
+      <form action="/delete/{{saved_drink.drink.id}}" method="POST">
+          <button class="btn btn-danger"><i class="fas fa-trash-alt"></i> </button>
+      </form>
+      <a href="/reviews/{{saved_drink.id}}" class="btn btn-primary">Write A Review <i class="fas fa-pen-square"></i></a>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+ingredients_lists

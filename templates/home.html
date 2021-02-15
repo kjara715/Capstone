@@ -6,17 +6,110 @@
 
 
 <h1>Start Your Search</h1>
-<form class="d-flex">
+<form class="d-flex" action="/search" method="POST">
     
-    <input class="form-control me-2" type="search" placeholder="Search for a cocktail " aria-label="Search">
+    <input class="form-control me-2" type="search" placeholder="Search for a cocktail " aria-label="Search" name="search">
     <button class="btn btn-outline-success" type="submit">Search</button>
 </form>
 
 <br>
+
+{% if not g.user %}
 <h2>New to *app_name*? Sign up below!</h2>
-<div class="edit-btn-area">
-    <button class="btn btn-success btn-lg">Sign Up</button>
-</div>
+<form action="/register">
+    <div class="edit-btn-area">
+        <button class="btn btn-success btn-lg">Sign Up</button>
+    </div>
+</form>
+{% else %}
+<h2>User Feed</h2>
+<div class="col-lg-6 col-md-8 col-sm-12">
+    <ul class="list-group" id="messages">
+      {% for review in reviews %}
+        <li class="list-group-item">
+            <div class="card">
+                <img class="card-img-top" src="{{review.image}}" alt="Card image cap">
+                <div class="card-body">
+                        
+                  <h5 class="card-title"><a href="/users/{{review.user.id}}"><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image">@{{review.user.username}}</a>'s review of {{review.drink.name}}</h5>
+                  {% if g.user.id == review.user.id %}
+                  <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                      <li><form action="/users/delete/{{review.id}}" method="POST">
+                        <button class="dropdown-item">Delete Review</button>
+                        </form></li>
+                      <li><form action="/users/edit/{{review.id}}" method="POST">
+                        <button class="dropdown-item">Edit Review</button>
+                    </form></li>
+                    </ul>
+                  </div>
+
+                  {% endif %}
+                  
+                  <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>
+                <div class="review-area">
+                    <br>
+                    <h6> Rating:</h6>
+                    <p>{{ review.rating }}/5.00</p>
+                    {% if review.review %}
+                    <h6>Review</h6>
+                    <p>{{ review.review }}</p>
+                    {% endif %}
+                </div>
+            
+                <form method="POST" action="/users/add_like/{{review.id}}">
+                    <button class="btn btn-lg 
+                        {% if review.id in likes %}
+                        btn-primary
+                        {% else %}
+                        btn-secondary
+                        {% endif %}
+                    ">Cheers
+                        <i class="fas fa-glass-cheers fa-lg"></i> 
+                    </button>
+                </form>
+                <button class="btn btn-lg btn-success comment">Comment
+                    <i class="far fa-comment"></i>
+                </button>
+                <form class="comment-form" method="POST" action="/users/comment/{{review.id}}">
+                    
+                    {{ form.hidden_tag() }}
+
+                    {% for field in form if field.widget.input_type != 'hidden' %}
+                      {% for error in field.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                      {% endfor %}
+                      {{ field.label }}
+                      {{ field(class="form-control") }}
+                    {% endfor %}
+            
+                    <div class="edit-btn-area">
+                      <button class="btn btn-primary">Post Comment</button>
+                    </div>
+                </form>
+                {% for comment in comments %}
+                    {% if review.id == comment.reviews_id %}
+                    <hr>
+                    <div class="d-flex p-2 bd-highlight bg-light">
+                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                        <p><b> @{{comment.user.username}}:</b> {{comment.text}}</p>
+                        
+                    </div>
+                    <hr>
+                    {% endif %}
+                {% endfor %}
+                </div>
+            </div>
+        </li>
+        <br>
+      {% endfor %}
+    </ul>
+  </div> 
+
+{% endif %}
 
 
 {% endblock %}
