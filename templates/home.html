@@ -11,6 +11,11 @@
     <input class="form-control me-2" type="search" placeholder="Search for a cocktail " aria-label="Search" name="search">
     <button class="btn btn-outline-success" type="submit">Search</button>
 </form>
+<br>
+<h2>No Ideas?</h2>
+<form action="/random" method="POST">
+    <button class="btn btn-outline-success" type="submit">Find Random Recipe</button>
+</form>
 
 <br>
 
@@ -23,8 +28,8 @@
 </form>
 {% else %}
 <h2>User Feed</h2>
-<div class="col-lg-6 col-md-8 col-sm-12">
-    <ul class="list-group" id="messages">
+<div class="d-flex justify-content-center col-lg-6 col-md-8 col-sm-12">
+    <ul class="d-flex justify-content-center list-group" id="messages">
       {% for review in reviews %}
         <li class="list-group-item">
             <div class="card">
@@ -32,48 +37,66 @@
                 <div class="card-body">
                         
                   <h5 class="card-title"><a href="/users/{{review.user.id}}"><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image">@{{review.user.username}}</a>'s review of {{review.drink.name}}</h5>
-                  {% if g.user.id == review.user.id %}
-                  <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="fas fa-ellipsis-h"></i>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                      <li><form action="/users/delete/{{review.id}}" method="POST">
-                        <button class="dropdown-item">Delete Review</button>
-                        </form></li>
-                      <li><form action="/users/edit/{{review.id}}" method="POST">
-                        <button class="dropdown-item">Edit Review</button>
-                    </form></li>
-                    </ul>
+                  <div class="outer">
+                    <div class="inner">
+                        <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>  
+                    </div>
+                    {% if g.user.id == review.user.id %}
+                    <div class="inner">
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                              <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                              <li><form action="/users/delete/{{review.id}}" method="POST">
+                                <button class="dropdown-item">Delete Review</button>
+                                </form></li>
+                              <li><form action="/users/edit/{{review.id}}" method="POST">
+                                <button class="dropdown-item">Edit Review</button>
+                            </form></li>
+                            </ul>
+                          </div>
+                    </div>
+                    {% endif %}
+                    
                   </div>
-
-                  {% endif %}
-                  
-                  <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>
+            
                 <div class="review-area">
-                    <br>
-                    <h6> Rating:</h6>
-                    <p>{{ review.rating }}/5.00</p>
+                    <hr>
+                    <div class="d-flex justify-content-center">
+                        <p><b>Rating: </b> </p>
+                        <p> {{ review.rating }}/5.00</p>
+                    </div>
                     {% if review.review %}
-                    <h6>Review</h6>
-                    <p>{{ review.review }}</p>
+                    <hr>
+                    <div class="d-flex justify-content-center">
+                        <p><b>Review: </b> </p>
+                        <p> {{ review.review }}</p>
+                    </div>
+                    <hr>
                     {% endif %}
                 </div>
-            
-                <form method="POST" action="/users/add_like/{{review.id}}">
-                    <button class="btn btn-lg 
-                        {% if review.id in likes %}
-                        btn-primary
-                        {% else %}
-                        btn-secondary
-                        {% endif %}
-                    ">Cheers
-                        <i class="fas fa-glass-cheers fa-lg"></i> 
-                    </button>
-                </form>
-                <button class="btn btn-lg btn-success comment">Comment
-                    <i class="far fa-comment"></i>
-                </button>
+                <div class="outer">
+                    <div class="inner">
+                        <form method="POST" action="/users/add_like/{{review.id}}">
+                            <button class="btn btn-lg 
+                                {% if review.id in likes %}
+                                btn-primary
+                                {% else %}
+                                btn-secondary
+                                {% endif %}
+                            ">Cheers
+                                <i class="fas fa-glass-cheers fa-lg"></i> 
+                            </button>
+                        </form>
+                    </div>
+                    <div class="inner">
+                        <button class="btn btn-lg btn-success comment">Comment
+                            <i class="far fa-comment"></i>
+                        </button>
+                    </div>
+                  </div>
+                
                 <form class="comment-form" method="POST" action="/users/comment/{{review.id}}">
                     
                     {{ form.hidden_tag() }}
@@ -85,18 +108,23 @@
                       {{ field.label }}
                       {{ field(class="form-control") }}
                     {% endfor %}
-            
-                    <div class="edit-btn-area">
+                    <br>
+                    <div class="btn-area">
                       <button class="btn btn-primary">Post Comment</button>
                     </div>
                 </form>
                 {% for comment in comments %}
                     {% if review.id == comment.reviews_id %}
                     <hr>
-                    <div class="d-flex p-2 bd-highlight bg-light">
-                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
-                        <p><b> @{{comment.user.username}}:</b> {{comment.text}}</p>
-                        
+                    <div class="d-flex p-2 bd-highlight bg-light align-items-center">
+                        {% if g.user.id == comment.user.id %}
+                        <div class="text-right">
+                            <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                        {% endif %}
+                        <div class="d flex justify-content-center">
+                            <p><a href="/users/{{comment.user.id}}"> <img src="{{ comment.user.profile_img }}" alt="user image" class="timeline-image">@{{comment.user.username}}</a>: {{comment.text}}</p>
+                        </div> 
                     </div>
                     <hr>
                     {% endif %}

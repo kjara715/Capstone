@@ -98,32 +98,71 @@ def search_drink():
     details=resp.json() #converts to python dictionary
 
     
-
+    
     my_drinks=details["drinks"] #gives list of drinks
     my_drinks_reduced=[]
-    for item in my_drinks: #each dict of different drink, item=1 drink
-        drink_dict={"strDrink": item["strDrink"],
+    if my_drinks:
+        
+        for item in my_drinks: #each dict of different drink, item=1 drink
+            drink_dict={"strDrink": item["strDrink"],
                       "strDrinkThumb": item["strDrinkThumb"],
                     "strInstructions": item["strInstructions"]}
   
-        for key in item:
-            if item[key]:
+            for key in item:
+                if item[key]:
       #this keeps getting mutated :( 
-                all_ingredients=[]
-                for number in range(1,16):
-                    if item[f"strMeasure{number}"] and item[f"strIngredient{number}"]:
-                        x=item[f"strMeasure{number}"]
-                        y=item[f"strIngredient{number}"]
-                        combined=x + ' '+ y
-                        all_ingredients.append(combined)
-                    elif item[f"strIngredient{number}"]:
-                        y=item[f"strIngredient{number}"]
-                        all_ingredients.append(y)
+                    all_ingredients=[]
+                    for number in range(1,16):
+                        if item[f"strMeasure{number}"] and item[f"strIngredient{number}"]:
+                            x=item[f"strMeasure{number}"]
+                            y=item[f"strIngredient{number}"]
+                            combined=x + ' '+ y
+                            all_ingredients.append(combined)
+                        elif item[f"strIngredient{number}"]:
+                            y=item[f"strIngredient{number}"]
+                            all_ingredients.append(y)
    
-        drink_dict["ingredient_list"]=all_ingredients
-        my_drinks_reduced.append(drink_dict)
+            drink_dict["ingredient_list"]=all_ingredients
+            my_drinks_reduced.append(drink_dict)
+    
 
     return render_template("drink_details.html", drink_list=my_drinks_reduced, search_term=search_term)
+
+@app.route('/random', methods=["POST"])
+def search_random_drink():
+    """Generates a random cocktail recipe for the user"""
+    resp=requests.get("https://www.thecocktaildb.com/api/json/v1/1/random.php")
+    details=resp.json()
+
+    
+    my_drinks=details["drinks"] #gives list of drinks
+    my_drinks_reduced=[]
+    if my_drinks:
+        
+        for item in my_drinks: #each dict of different drink, item=1 drink
+            drink_dict={"strDrink": item["strDrink"],
+                      "strDrinkThumb": item["strDrinkThumb"],
+                    "strInstructions": item["strInstructions"]}
+  
+            for key in item:
+                if item[key]:
+      #this keeps getting mutated :( 
+                    all_ingredients=[]
+                    for number in range(1,16):
+                        if item[f"strMeasure{number}"] and item[f"strIngredient{number}"]:
+                            x=item[f"strMeasure{number}"]
+                            y=item[f"strIngredient{number}"]
+                            combined=x + ' '+ y
+                            all_ingredients.append(combined)
+                        elif item[f"strIngredient{number}"]:
+                            y=item[f"strIngredient{number}"]
+                            all_ingredients.append(y)
+   
+            drink_dict["ingredient_list"]=all_ingredients
+            my_drinks_reduced.append(drink_dict)
+    
+
+    return render_template("random_drink.html", drink_list=my_drinks_reduced)
 
 @app.route('/register', methods=["GET", "POST"])
 def register_user():

@@ -31,18 +31,22 @@
               {% else %}
                 <li>
                     <a class="nav-link" href="/users/{{ g.user.id }}">
-                        <img id="profile-img" src="{{ g.user.profile_img }}" alt="{{ g.user.username }}" class="img-responsive">
+                        <img src="{{ g.user.profile_img }}" alt="user image" class="timeline-image">
+                        <!-- <img id="profile-img" src="{{ g.user.profile_img }}" alt="{{ g.user.username }}" class="img-responsive"> -->
                     </a>
                 </li>
-                <li><a class="nav-link" href="/reviews/new">New Review <i class="fas fa-pen-square"></i></a></li>
-                <li><a class="nav-link" href="/users">Discover Users</a></li>
-                <li><a class="nav-link" href="/logout">Log out</a></li>
+                <li class="d-flex align-items-center"><a class="nav-link" href="/reviews/new">New Review <i class="fas fa-pen-square"></i></a></li>
+                <li class="d-flex align-items-center"><a class="nav-link" href="/users">Discover Users</a></li>
+                <li class="d-flex align-items-center"><a class="nav-link" href="/logout">Log out</a></li>
                 {% endif %}
             </ul>
             <form class="d-flex" action="/search" method="POST">
               <input class="form-control me-2" type="search" placeholder="Search for a cocktail" aria-label="Search" name="search">
               <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
+            <form class="d-flex" action="/random" method="POST">
+              <button class="btn btn-outline-primary" type="submit">Find Random Recipe</button>
+          </form>
           </div>
         </div>
       </nav>

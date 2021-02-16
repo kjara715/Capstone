@@ -20,7 +20,7 @@ $(document).ready(function(){
 
     $(document).on("click", ".comment", function(){
 
-        $(this).parent().children(".comment-form").toggle()
+        $(this).parent().parent().parent().children(".comment-form").toggle()
 
     })
 
