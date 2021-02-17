@@ -2,10 +2,11 @@
 
 {% block title %}Saved Recipes{% endblock %}
 {% block content %}
-<h1>My Saved Recipes</h1>
+<h1 class="text-center">My Saved Recipes</h1>
 {% if not user_drinks %}
-<p>You do not currently have any saved recipes</p>
+<p class="text-center">You do not currently have any saved recipes</p>
 {% endif %}
+<div class="row justify-content-md-center">
 {% for saved_drink in user_drinks %}
 <div class="card" style="width: 22rem;">
     <img class="card-img-top" src="{{saved_drink.drink.image}}" alt="Card image cap">
@@ -20,14 +21,29 @@
       </ul>
       <h6 class="card-text">Instructions:</h6>
       <p  class="card-text">{{saved_drink.drink.instructions}}</p>
-      <a href="#" class="btn btn-secondary recipe">View Recipe</a> 
-      <form action="/delete/{{saved_drink.drink.id}}" method="POST">
-          <button class="btn btn-danger"><i class="fas fa-trash-alt"></i> </button>
-      </form>
-      <a href="/reviews/{{saved_drink.id}}" class="btn btn-primary">Write A Review <i class="fas fa-pen-square"></i></a>
+      <div class="outer">
+        <div class="inner">
+            <button class="btn btn-secondary recipe">View Recipe</button> 
+        </div>
+        <div class="inner">
+            <a href="/reviews/{{saved_drink.id}}" class="btn btn-primary">Write a review <i class="fas fa-pen-square"></i></a> 
+        </div>
+        <div class="inner">
+            <form action="/delete/{{saved_drink.drink.id}}" method="POST">
+                <button class="btn btn-danger"><i class="fas fa-trash-alt"></i> </button>
+            </form>
+        </div>
+      </div>
+      
+      
+      
     </div>
 </div>
+<br>
+
 {% endfor %}
+</div>
+
 {% endblock %}
 
 ingredients_lists

@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
-from forms import SignUp, LoginForm, ReviewForm, UserEditForm, CommentForm, EditReviewForm
+from forms import SignUp, LoginForm, ReviewForm, UserEditForm, CommentForm
 
 from models import User, Review, Drink, Saved_recipe, Likes, Follows, Comment, db, connect_db
 
@@ -164,6 +164,14 @@ def search_random_drink():
 
     return render_template("random_drink.html", drink_list=my_drinks_reduced)
 
+@app.route("/instructions")
+def user_instructions():
+    if not g.user:
+        flash("Please login or create an account to view these instructions.", "danger")
+        return redirect("/")
+
+    return render_template("instructions.html")
+
 @app.route('/register', methods=["GET", "POST"])
 def register_user():
     """Returns form to register a new user.
@@ -240,7 +248,9 @@ def users_show(user_id):
                 .limit(100)
                 .all())
 
-    return render_template('user_profile.html', user=user, reviews=reviews)
+    form=CommentForm()
+
+    return render_template('user_profile.html', user=user, reviews=reviews, form=form)
 
 @app.route('/users/edit', methods=["GET", "POST"])
 def edit_profile():
@@ -306,7 +316,7 @@ def follow_user(user_id):
     g.user.following.append(follow)
     db.session.commit()
 
-    flash(f"You are now following {follow.username}", "success")
+    flash(f"You are now following @{follow.username}", "success")
     return redirect("/users")
 
 @app.route('/users/stop-following/<int:user_id>', methods=['POST'])
@@ -319,10 +329,10 @@ def stop_following(user_id):
 
     followed_user = User.query.get(user_id)
     g.user.following.remove(followed_user)
-    flash(f"You have unfollowed {followed_user.username}", "primary")
+    flash(f"You have unfollowed @{followed_user.username}", "primary")
     db.session.commit()
 
-    return redirect(f"/users/{g.user.id}/following")
+    return redirect(f"/users")
 
 @app.route('/save', methods=["POST"])
 def save_recipe():
@@ -413,40 +423,6 @@ def delete_saved(drink_id):
 
     return redirect('/')
 
-@app.route('/reviews/new', methods=["GET", "POST"])
-def make_review():
-    """Displays form to write a new review and processes the form"""
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-
-    form = ReviewForm()
-    
-    if form.validate_on_submit():
-
-        if form.image.data:
-            display_img=form.image.data
-        else:
-            display_img="https://banner2.cleanpng.com/20190714/uvh/kisspng-martini-cocktail-glass-clip-art-vector-graphics-home-forty-two-peterborough-5d2b093a9f6130.8579484215631014986528.jpg"
-
-        drink = Drink.query.filter_by(name=form.drink_name.data).one()
-        review = Review(
-            drink_id= drink.id,
-            rating=round(float(form.rating.data),2),
-            review=form.review.data,
-            image=display_img,
-            user_id=g.user.id
-        )
-        
-        db.session.add(review)    
-        db.session.commit()
-
-        return redirect("/")
-
-        #Review.image.default.arg
-
-    return render_template('review.html', form=form)
-
 @app.route('/users/add_like/<int:review_id>', methods=["POST"])
 def like_message(review_id):
     """Like/"cheers" a message."""
@@ -523,7 +499,7 @@ def edit_review(review_id):
         return redirect("/")
 
     review=Review.query.get(review_id)
-    form=EditReviewForm(obj=review)
+    form=ReviewForm(obj=review)
     drink_name=review.drink.name
 
     if form.image.data:
@@ -555,7 +531,7 @@ def review_for(saved_drink_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    form = EditReviewForm()
+    form = ReviewForm()
 
     saved_drink=Saved_recipe.query.get(saved_drink_id)
     
@@ -580,6 +556,25 @@ def review_for(saved_drink_id):
         return redirect("/")
 
     return render_template("single_review.html", saved_drink=saved_drink, form=form)
+
+@app.route("/users/<int:comment_id>/delete", methods=["POST"])
+def delete_comment(comment_id):
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    comment=Comment.query.get(comment_id)
+
+    if comment.user_id is not g.user.id:
+        flash("You cannot delete another user's comment that is not on your post")
+        return redirect("/")
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return redirect("/")
+    
+
 
 
 

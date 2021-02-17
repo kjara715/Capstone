@@ -1,29 +1,20 @@
 
 {% extends 'base.html' %}
-{% block title%}Users {% endblock %}
+{% block title%}Users{% endblock %}
 {% block content %}
   {% if users|length == 0 %}
-    <h3>Sorry, no users found</h3>
+    <h3 class="text-center">Sorry, no users found</h3>
   {% else %}
-    <div class="row justify-content-end">
+  <h2 class="text-center">Discover Users on <span class="app-name">HomeMixers</span></h2>
+    <div class="row justify-content-center">
       <div class="col-sm-9">
         <div class="row">
-
           {% for user in users %}
-
-            <div class="col-lg-4 col-md-6 col-12">
-              <div class="card user-card">
-                <div class="card-inner">
-                  <div class="image-wrapper">
-                    <img src="{{ user.banner_img }}" alt="" class="card-hero">
-                  </div>
-                  <div class="card-contents">
-                    <a href="/users/{{ user.id }}" class="card-link">
-                      <img src="{{ user.profile_img }}" alt="Image for {{ user.username }}" class="card-image">
-                      <p>@{{ user.username }}</p>
-                    </a>
-
-                    {% if g.user %}
+          <div class="card col-lg-4 col-md-6 col-12" >
+            <img class="card-img-top" src="{{ user.banner_img }}" alt="Card image cap">
+            <div class="card-contents">
+              <h5 class="card-title"><a href="/users/{{user.id}}"><img src="{{ user.profile_img }}" alt="user image" class="timeline-image">@{{user.username}}</a></h5>
+              {% if g.user %}
                       {% if g.user.is_following(user) %}
                         <form method="POST" action="/users/stop-following/{{ user.id }}">
                           <button class="btn btn-primary btn-sm">Unfollow</button>
@@ -35,15 +26,14 @@
                         </form>
                       {% endif %}
                     {% endif %}
-
                   </div>
-                  <p class="card-bio">{{ user.bio }}</p>
-                </div>
-              </div>
+                  {% if user.bio %}
+                  <br>
+                  <h6>Bio</h6>
+                  <p>{{ user.bio }}</p>
+                  {% endif %}
             </div>
-
-          {% endfor %}
-
+        {% endfor %}
         </div>
       </div>
     </div>

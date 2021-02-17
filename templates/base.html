@@ -12,14 +12,16 @@
     <script src="https://unpkg.com/bootstrap"></script>
     <script src="https://kit.fontawesome.com/d9cb900708.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/"><i class="fas fa-glass-cheers fa-lg"></i></a>
+          <a class="navbar-brand" href="/"><span class="app-name">HomeMixers</span> <i class="fas fa-home"></i></a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -35,9 +37,9 @@
                         <!-- <img id="profile-img" src="{{ g.user.profile_img }}" alt="{{ g.user.username }}" class="img-responsive"> -->
                     </a>
                 </li>
-                <li class="d-flex align-items-center"><a class="nav-link" href="/reviews/new">New Review <i class="fas fa-pen-square"></i></a></li>
                 <li class="d-flex align-items-center"><a class="nav-link" href="/users">Discover Users</a></li>
                 <li class="d-flex align-items-center"><a class="nav-link" href="/logout">Log out</a></li>
+                <li class="d-flex align-items-center"><a class="nav-link" href="/instructions">Instructions</a></li>
                 {% endif %}
             </ul>
             <form class="d-flex" action="/search" method="POST">
@@ -50,7 +52,7 @@
           </div>
         </div>
       </nav>
-  
+      <br>
       <div class="container">
         {% for category, message in get_flashed_messages(with_categories=True) %}
         <div class="alert alert-{{ category }}">{{ message }}</div>

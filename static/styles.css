@@ -33,7 +33,7 @@
   width: 200px;
   height: 200px;
   border: 5px solid #fff;
-  margin-top: -120px;
+  margin-top: -225px;
   z-index: 1;
   position: relative;
   box-shadow: 0 1px 1px rgba(136, 153, 166, 0.15);
@@ -53,7 +53,7 @@ img {
 
 #background-image {
   width:100%;
-  height:100%;
+  height:400px;
 }
 
 .outer
@@ -65,3 +65,58 @@ img {
 {
     display: inline-block;
 }
+
+body {
+  background-image: url("bg option-3.jpg");
+  background-color: #cccccc;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+ }
+
+
+ h1, h2, h3 {
+   color: white;
+   text-shadow: #3b3939;
+   /* -webkit-text-stroke: 1px rgb(44, 43, 43); */
+   
+ }
+
+ .list-group-item {
+  background-color: rgba(241, 247, 252, 0.4);
+ }
+
+
+ .stat {
+   margin: 3px;
+ }
+
+ #user-stats {
+  background-color: rgba(241, 247, 252, 0.7);
+ }
+
+ .bio {
+  background-color: rgba(241, 247, 252, 0.5);
+ }
+
+ #instructions-list {
+   background-color: rgba(241, 247, 252, 0.6);
+   font-size: 15pt;
+ }
+
+ #user-instructions > ul {
+  background-color: rgba(241, 247, 252, 0.7);
+  font-size: 15pt;
+ }
+
+ .transparent {
+  background-color: rgba(241, 247, 252, 0.6);
+ }
+
+ .form-heading {
+   color: black;
+ }
+
+ .app-name {
+  font-family: 'Lobster', cursive;
+ }

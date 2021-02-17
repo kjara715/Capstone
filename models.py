@@ -263,6 +263,8 @@ class Review(db.Model):
 
     )
 
+    likes=db.relationship('Likes')
+
 class Drink(db.Model):
     """Drink recipe model"""
 

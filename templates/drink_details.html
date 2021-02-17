@@ -6,18 +6,19 @@
 
 
 
-<h1>Start Your Search</h1>
+<h1 class="text-center">Start Your Search</h1>
 <form class="d-flex" action="/search" method="POST">
     
     <input class="form-control me-2" type="search" placeholder="Search for a cocktail " aria-label="Search" name="search" value="{{search_term}}">
-    <button class="btn btn-outline-success" type="submit">Search</button>
+    <button class="btn btn-success" type="submit">Search</button>
 </form>
 
 <br>
 {% if not drink_list %}
-<h3>No drinks found for <i>{{search_term}}</i></h3>
+<h3 class="text-center">No drinks found for <i>{{search_term}}</i></h3>
 {% else %}
-<h3>Showing {{ drink_list|length}} results for <i>{{search_term}}</i></h3>
+<h3 class="text-center">Showing {{ drink_list|length}} results for <i>{{search_term}}</i></h3>
+<div class="row justify-content-md-center">
 {% for drink in drink_list %}
 <div class="card" style="width: 22rem;">
     <img class="card-img-top" src="{{drink["strDrinkThumb"]}}" alt="Card image cap">
@@ -31,27 +32,26 @@
         </ul>
       <h6 class="card-text">Instructions:</h6>
       <p class="card-text">{{drink["strInstructions"]}}</p>
-      <button class="btn btn-secondary recipe">View Recipe</button>
-    
-      <form action="/save" method="post">
-        <input hidden type="text" name="name" value="{{drink["strDrink"]}}">
-        <input hidden type="text" name="ingredients" value="{{drink["ingredient_list"]}}"> 
-        <input hidden type="text" name="instructions" value="{{drink["strInstructions"]}}">
-        <input hidden type="text" name="image" value="{{drink["strDrinkThumb"]}}">  
-        <button class="btn btn-light"><i class="far fa-bookmark"></i></button>
-      </form>
-      
+      <div class="outer">
+        <div class="inner">
+            <button class="btn btn-secondary recipe">View Recipe</button>
+        </div>
+        <div class="inner">
+            <form action="/save" method="post">
+                <input hidden type="text" name="name" value="{{drink["strDrink"]}}">
+                <input hidden type="text" name="ingredients" value="{{drink["ingredient_list"]}}"> 
+                <input hidden type="text" name="instructions" value="{{drink["strInstructions"]}}">
+                <input hidden type="text" name="image" value="{{drink["strDrinkThumb"]}}">  
+                <button class="btn btn-light">Save <i class="far fa-bookmark"></i></button>
+              </form>    
+        </div>
     </div>
+</div>
 </div>
 <br>
 {% endfor %}
-{% endif %}
-{% if not g.user %}
-<h2>New to *app_name*? Sign up below!</h2>
-<form action="/register">
-    <div class="edit-btn-area">
-        <button class="btn btn-success btn-lg">Sign Up</button>
-    </div>
-</form>
+
+</div>
+
 {% endif %}
 {% endblock %}

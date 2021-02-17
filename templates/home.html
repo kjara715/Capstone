@@ -5,137 +5,186 @@
 {% block content %}
 
 
-<h1>Start Your Search</h1>
+<h1 class="text-center">Search <span class="app-name">HomeMixers</span></h1>
 <form class="d-flex" action="/search" method="POST">
     
     <input class="form-control me-2" type="search" placeholder="Search for a cocktail " aria-label="Search" name="search">
-    <button class="btn btn-outline-success" type="submit">Search</button>
+    <button class="btn btn-success" type="submit">Search</button>
 </form>
 <br>
-<h2>No Ideas?</h2>
-<form action="/random" method="POST">
-    <button class="btn btn-outline-success" type="submit">Find Random Recipe</button>
+<h2 class="text-center">No Ideas?</h2>
+<form class="text-center" action="/random" method="POST">
+    <button class="btn btn-primary" type="submit">Find Random Recipe</button>
 </form>
 
 <br>
 
 {% if not g.user %}
-<h2>New to *app_name*? Sign up below!</h2>
-<form action="/register">
-    <div class="edit-btn-area">
-        <button class="btn btn-success btn-lg">Sign Up</button>
-    </div>
-</form>
-{% else %}
-<h2>User Feed</h2>
-<div class="d-flex justify-content-center col-lg-6 col-md-8 col-sm-12">
-    <ul class="d-flex justify-content-center list-group" id="messages">
-      {% for review in reviews %}
-        <li class="list-group-item">
-            <div class="card">
-                <img class="card-img-top" src="{{review.image}}" alt="Card image cap">
-                <div class="card-body">
-                        
-                  <h5 class="card-title"><a href="/users/{{review.user.id}}"><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image">@{{review.user.username}}</a>'s review of {{review.drink.name}}</h5>
-                  <div class="outer">
-                    <div class="inner">
-                        <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>  
-                    </div>
-                    {% if g.user.id == review.user.id %}
-                    <div class="inner">
-                        <div class="dropdown">
-                            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                              <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                              <li><form action="/users/delete/{{review.id}}" method="POST">
-                                <button class="dropdown-item">Delete Review</button>
-                                </form></li>
-                              <li><form action="/users/edit/{{review.id}}" method="POST">
-                                <button class="dropdown-item">Edit Review</button>
-                            </form></li>
-                            </ul>
-                          </div>
-                    </div>
-                    {% endif %}
-                    
-                  </div>
-            
-                <div class="review-area">
-                    <hr>
-                    <div class="d-flex justify-content-center">
-                        <p><b>Rating: </b> </p>
-                        <p> {{ review.rating }}/5.00</p>
-                    </div>
-                    {% if review.review %}
-                    <hr>
-                    <div class="d-flex justify-content-center">
-                        <p><b>Review: </b> </p>
-                        <p> {{ review.review }}</p>
-                    </div>
-                    <hr>
-                    {% endif %}
-                </div>
-                <div class="outer">
-                    <div class="inner">
-                        <form method="POST" action="/users/add_like/{{review.id}}">
-                            <button class="btn btn-lg 
-                                {% if review.id in likes %}
-                                btn-primary
-                                {% else %}
-                                btn-secondary
-                                {% endif %}
-                            ">Cheers
-                                <i class="fas fa-glass-cheers fa-lg"></i> 
-                            </button>
-                        </form>
-                    </div>
-                    <div class="inner">
-                        <button class="btn btn-lg btn-success comment">Comment
-                            <i class="far fa-comment"></i>
-                        </button>
-                    </div>
-                  </div>
-                
-                <form class="comment-form" method="POST" action="/users/comment/{{review.id}}">
-                    
-                    {{ form.hidden_tag() }}
+<h2 class="text-center">New to <span class="app-name">HomeMixers</span>?</h2>
 
-                    {% for field in form if field.widget.input_type != 'hidden' %}
-                      {% for error in field.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                      {% endfor %}
-                      {{ field.label }}
-                      {{ field(class="form-control") }}
-                    {% endfor %}
-                    <br>
-                    <div class="btn-area">
-                      <button class="btn btn-primary">Post Comment</button>
-                    </div>
-                </form>
-                {% for comment in comments %}
-                    {% if review.id == comment.reviews_id %}
-                    <hr>
-                    <div class="d-flex p-2 bd-highlight bg-light align-items-center">
-                        {% if g.user.id == comment.user.id %}
-                        <div class="text-right">
-                            <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+<div class="text-center">
+  <button id="instructions" class="btn btn-secondary btn-lg">Instructions For New Users</button>
+</div>
+<br>
+
+  <div id="instructions-list">
+    <h4 class="text-center">Using *app_name* </h4>
+    <ol>
+      <li>Search the app by key terms to generate a list of cocktails to create at home.
+        <br>
+        <span>Example of key terms: <i>margarita, vodka, martini</i></span>
+        <br>
+        Alternatively you can obtain a random cocktail by clicking on the "Find Random Recipe" button
+      </li>
+      <br>
+      <li>To view a recipe of a drink that appears, simply click on "View Recipe." This will give an instructions and ingredients list. To save a recipe,
+        click "Save."
+        <br>
+        <span><b>Note:</b><i> You must be logged into an account to save a recipe to your profile page</i></span>
+        <br>
+        <span>Don't have an account? 
+          <form action="/register">
+              <button class="btn btn-success btn-sm">Sign Up</button>
+          </form> 
+        </span>
+      </li>
+    </ol>
+    <br>
+  </div>
+
+
+{% else %}
+<h3 class="text-center">User Feed</h3>
+{% if reviews|length == 0 %}
+<p class="text-center" style="color: white">There are currently no reviews in your User Feed</p>
+{% endif %}
+<div class="row justify-content-md-center">
+    <div class="d-flex col-lg-6 col-md-8 col-sm-12">
+        <ul class="list-inline list-group justify-content-center" id="messages">
+          {% for review in reviews %}
+            <li class="list-group-item list-inline-item">
+                <div class="card">
+                    <img class="card-img-top" src="{{review.image}}" alt="Card image cap">
+                    <div class="card-body">
+                            
+                      <h5 class="card-title"><a href="/users/{{review.user.id}}"><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image">@{{review.user.username}}</a>'s review of {{review.drink.name}}</h5>
+                      <div class="outer">
+                        <div class="inner">
+                            <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>  
+                        </div>
+                        {% if g.user.id == review.user.id %}
+                        <div class="inner">
+                            <div class="dropdown">
+                                <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                  <li><form action="/users/delete/{{review.id}}" method="POST">
+                                    <button class="dropdown-item">Delete Review</button>
+                                    </form></li>
+                                  <li><form action="/users/edit/{{review.id}}" method="POST">
+                                    <button class="dropdown-item">Edit Review</button>
+                                </form></li>
+                                </ul>
+                              </div>
                         </div>
                         {% endif %}
-                        <div class="d flex justify-content-center">
-                            <p><a href="/users/{{comment.user.id}}"> <img src="{{ comment.user.profile_img }}" alt="user image" class="timeline-image">@{{comment.user.username}}</a>: {{comment.text}}</p>
-                        </div> 
+                        
+                      </div>
+                
+                    <div class="review-area">
+                        <hr>
+                        <div class="d-flex justify-content-center">
+                            <p><b>Rating: </b> </p>
+                            <p> {{ review.rating }}/5.00</p>
+                        </div>
+                        {% if review.review %}
+                        <hr>
+                        <div class="d-flex justify-content-center">
+                            <p><b>Review: </b> </p>
+                            <p> {{ review.review }}</p>
+                        </div>
+                        <hr>
+                        {% endif %}
                     </div>
-                    <hr>
-                    {% endif %}
-                {% endfor %}
+                    <div class="outer">
+                        <div class="inner">
+                            <form method="POST" action="/users/add_like/{{review.id}}">
+                                <button class="btn btn-lg 
+                                    {% if review.id in likes %}
+                                    btn-primary
+                                    {% else %}
+                                    btn-secondary
+                                    {% endif %}
+                                ">Cheers
+                                    <i class="fas fa-glass-cheers fa-lg"></i> 
+                                </button>
+                            </form>
+                        </div>
+                        <div class="inner">
+                            <button class="btn btn-lg btn-success comment">Comment
+                                <i class="far fa-comment"></i>
+                            </button>
+                        </div>
+                      </div>
+                      {% if review.likes %}
+                      <br>
+                      {% if review.likes|length == 1 %}
+                      <div class="outer">
+                        <div class="inner">
+                            <p><a href="#">{{review.likes|length}}</a> user cheers'd this review</p>
+                        </div>
+                      </div>
+                      {% else %}
+                      <div class="outer">
+                        <div class="inner">
+                            <p><a href="#">{{review.likes|length}}</a> users cheers'd this review </p>
+                          </div>
+                      </div>
+                      {% endif %}
+                      {% endif %}
+                      
+                    <form class="comment-form" method="POST" action="/users/comment/{{review.id}}">
+                        
+                        {{ form.hidden_tag() }}
+    
+                        {% for field in form if field.widget.input_type != 'hidden' %}
+                          {% for error in field.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                          {{ field.label }}
+                          {{ field(class="form-control") }}
+                        {% endfor %}
+                        <br>
+                        <div class="btn-area">
+                          <button class="btn btn-primary">Post Comment</button>
+                        </div>
+                    </form>
+                    {% for comment in comments %}
+                        {% if review.id == comment.reviews_id %}
+                        <hr>
+                        <div class="d-flex p-2 bd-highlight bg-light align-items-center">
+                            {% if g.user.id == comment.user.id %}
+                            <div class="text-right">
+                                <form action="/users/{{comment.id}}/delete" method="POST">
+                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                                </form>  
+                            </div>
+                            {% endif %}
+                            <div class="d flex justify-content-center">
+                                <p><a href="/users/{{comment.user.id}}"> <img src="{{ comment.user.profile_img }}" alt="user image" class="timeline-image">@{{comment.user.username}}</a>: {{comment.text}}</p>
+                            </div> 
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
                 </div>
-            </div>
-        </li>
-        <br>
-      {% endfor %}
-    </ul>
-  </div> 
+            </li>
+            <br>
+          {% endfor %}
+        </ul>
+      </div>
+</div>
 
 {% endif %}
 

@@ -4,8 +4,8 @@
 {% block content %}
 
 <div class="row justify-content-md-center">
-    <div class="col-md-4">
-      <h2 class="join-message">Edit Your Profile</h2>
+    <div class="col-md-6 transparent">
+      <h2 class="join-message text-center form-heading">Edit Your Profile</h2>
       <form method="POST" id="user_form">
         {{ form.hidden_tag() }}
 
@@ -26,12 +26,13 @@
           {% endfor %}
         {% endif %}
         {{ form.password(placeholder="Enter your password to confirm", class="form-control") }}
-
+          <br>
         <div class="edit-btn-area">
           <button class="btn btn-success">Save Changes</button>
-          <a href="/" class="btn btn-outline-secondary">Cancel</a>
+          <a href="/" class="btn btn-secondary">Cancel</a>
         </div>
       </form>
+      <br>
     </div>
   </div>
 {% endblock %}

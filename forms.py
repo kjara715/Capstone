@@ -17,14 +17,8 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
 
+
 class ReviewForm(FlaskForm):
-
-    drink_name = StringField("Drink")
-    rating = FloatField("Rating")
-    review = StringField("Review") 
-    image=StringField("Image URL")
-
-class EditReviewForm(FlaskForm):
     
     rating = FloatField("Rating")
     review = StringField("Review") 

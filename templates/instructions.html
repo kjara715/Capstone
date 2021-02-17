@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Instructions{% endblock %}
+
+{% block content %}
+
+    <div id="user-instructions">
+        
+        <ul>
+            <h2 class="text-center form-heading">Navigating <span class="app-name">HomeMixers</span></h2>
+            <li>
+                <b>Home Page <i class="fas fa-home"></i></b>
+                <br>
+                From the home page search for recipes by typing terms into the search bar or clicking on <i>Find Random Recipe</i>, This may also be done on the Navigation Bar.
+                <br>
+                Your user feed will appear on the home screen, containing the most recent reviews made by you, and users you follow.
+            </li>
+            <li>
+                <b>Saving Recipes</b>
+                <br>
+                After making a search, a list of recipes will appear. Logged in users can save a recipe simply by clicking on the <i>Save</i> button. All saved recipes will be accessible
+                from you Profile Page under <i>My Saved Recipes</i>.
+            </li>
+            <li>
+                <b>Discover Users Page </b>
+                <br>
+                Find other users on *app_name*, view profiles, and follow/unfollow users.
+            </li>
+            <li>
+                <b>Profile Page</b>
+                <br>
+                To View Your Profile click on the profile image icon in the Navigation Bar. Your Profile Page contains:
+                <ul>
+                    <li><i>Profile Image, Banner Image, Username, and Bio (if present)</i></li>
+                    <li><i>List of Reviews</i></li>
+                    <li><i>Following</i> link</li>
+                    <li><i>Followers</i> link</li>
+                    <li><i>My Saved Recipes</i> link</li>
+                    <li><i>Edit Profile</i> button</li>
+                    <li><i>Delete Profile</i> button</li>
+                </ul>
+            
+            </li>
+            <li>
+                <b>Write Reviews</b>
+                <br>
+                Write a review from your saved recipes by clicking on the <i>Write a review</i> button. The form to write a review will ask for:
+                <ul>
+                    <li>A rating (from 0 to 5)</li>
+                    <li>A written review (optional)</li>
+                    <li>An image URL of your creation (optional)</li>
+                </ul>
+                Reviews can always be edited or deleted by the user who wrote the review.
+            </li>
+            <li>
+                <b>Cheers <i class="fas fa-glass-cheers fa-lg"></i>  or Comment <i class="far fa-comment"></i> on Reviews</b>
+                <br>
+                Engage in other users' reviews by leaving them a comment or cheers'ing (liking) their review!
+            </li>
+            <br>
+          </ul>
+         
+    </div>
+    
+{% endblock %}

@@ -1,8 +1,9 @@
 //logic to hide or show recipe details by clicking View Recipe Button
-$(document).ready(function(){
+$(document).ready(function() {
 
-    $(".card-text").hide()
-    $(".comment-form").hide()
+    $(".card-text").hide();
+    $(".comment-form").hide();
+    $("#instructions-list").hide();
 
     $(document).on("click", ".recipe", function(){
 
@@ -14,7 +15,7 @@ $(document).ready(function(){
         }
         
         //show and hide recipe on each button click
-        $(this).parent().children('.card-text').toggle()
+        $(this).parent().parent().parent().children('.card-text').toggle()
         
     });
 
@@ -22,7 +23,20 @@ $(document).ready(function(){
 
         $(this).parent().parent().parent().children(".comment-form").toggle()
 
+    });
+
+    $(document).on("click", "#instructions", function(){
+
+        if($(this).text() === "Instructions For New Users"){
+            $(this).text("Hide Instructions")
+        } else {
+            $(this).text("Instructions For New Users")
+        }
+        $(this).parent().parent().children("#instructions-list").toggle()
     })
 
+})
 
-  });
+
+
+
