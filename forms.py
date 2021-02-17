@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, FloatField
 from wtforms.fields.html5 import DecimalRangeField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms.validators import DataRequired, Email, Length, URL, NumberRange
 
 class SignUp(FlaskForm):
     """Form to sign up as a new user"""
@@ -20,9 +20,11 @@ class LoginForm(FlaskForm):
 
 class ReviewForm(FlaskForm):
     
-    rating = FloatField("Rating")
-    review = StringField("Review") 
+    rating = FloatField("Rating (0 to 5)", validators=[DataRequired(), NumberRange(min=0, max=5, message="Your rating must be a value between 0 and 5")])
+    review = StringField("Review", validators=[Length(max=100, message="Your review cannot exceed 100 characters")]) 
     image=StringField("Image URL")
+
+    #  validators=[URL()] --> not working bc won't allow a null input
     
 
 class UserEditForm(FlaskForm):

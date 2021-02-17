@@ -5,52 +5,54 @@
 {% block content %}
 
 
-<h1 class="text-center">Search <span class="app-name">HomeMixers</span></h1>
-<form class="d-flex" action="/search" method="POST">
-    
-    <input class="form-control me-2" type="search" placeholder="Search for a cocktail " aria-label="Search" name="search">
-    <button class="btn btn-success" type="submit">Search</button>
-</form>
-<br>
-<h2 class="text-center">No Ideas?</h2>
-<form class="text-center" action="/random" method="POST">
-    <button class="btn btn-primary" type="submit">Find Random Recipe</button>
-</form>
-
-<br>
-
-{% if not g.user %}
-<h2 class="text-center">New to <span class="app-name">HomeMixers</span>?</h2>
-
-<div class="text-center">
-  <button id="instructions" class="btn btn-secondary btn-lg">Instructions For New Users</button>
-</div>
-<br>
-
-  <div id="instructions-list">
-    <h4 class="text-center">Using *app_name* </h4>
-    <ol>
-      <li>Search the app by key terms to generate a list of cocktails to create at home.
-        <br>
-        <span>Example of key terms: <i>margarita, vodka, martini</i></span>
-        <br>
-        Alternatively you can obtain a random cocktail by clicking on the "Find Random Recipe" button
-      </li>
-      <br>
-      <li>To view a recipe of a drink that appears, simply click on "View Recipe." This will give an instructions and ingredients list. To save a recipe,
-        click "Save."
-        <br>
-        <span><b>Note:</b><i> You must be logged into an account to save a recipe to your profile page</i></span>
-        <br>
-        <span>Don't have an account? 
-          <form action="/register">
-              <button class="btn btn-success btn-sm">Sign Up</button>
-          </form> 
-        </span>
-      </li>
-    </ol>
-    <br>
+  <h1 class="text-center">Search <span class="app-name">HomeMixers</span></h1>
+  <form class="d-flex" action="/search" method="POST">
+      
+      <input class="form-control me-2" type="search" placeholder="Search for a cocktail " aria-label="Search" name="search">
+      <button class="btn btn-success" type="submit">Search</button>
+  </form>
+  <br>
+  <h2 class="text-center">No Ideas?</h2>
+  <form class="text-center" action="/random" method="POST">
+      <button class="btn btn-primary" type="submit">Find Random Recipe</button>
+  </form>
+  
+  <br>
+  
+  {% if not g.user %}
+  <h2 class="text-center">New to <span class="app-name">HomeMixers</span>?</h2>
+  
+  <div class="text-center">
+    <button id="instructions" class="btn btn-secondary btn-lg">Instructions For New Users</button>
   </div>
+  <br>
+  
+    <div id="instructions-list">
+      <h4 class="text-center">Using <span class="app-name">HomeMixers</span> </h4>
+      <ol>
+        <li>Search the app by key terms to generate a list of cocktails to create at home.
+          <br>
+          <span>Example of key terms: <i>margarita, vodka, martini</i></span>
+          <br>
+          Alternatively you can obtain a random cocktail by clicking on the "Find Random Recipe" button
+        </li>
+        <br>
+        <li>To view a recipe of a drink that appears, simply click on "View Recipe." This will give an instructions and ingredients list. To save a recipe,
+          click "Save."
+          <br>
+          <span><b>Note:</b><i> You must be logged into an account to save a recipe to your profile page</i></span>
+          <br>
+          <span>Don't have an account? 
+            <form action="/register">
+                <button class="btn btn-success btn-sm">Sign Up</button>
+            </form> 
+          </span>
+        </li>
+      </ol>
+      <br>
+    </div>
+
+
 
 
 {% else %}
@@ -117,7 +119,13 @@
                                     btn-secondary
                                     {% endif %}
                                 ">Cheers
+                                    {% if review.id in likes %}
                                     <i class="fas fa-glass-cheers fa-lg"></i> 
+                                    {% else %}
+                                    <i class="fas fa-wine-glass-alt"></i>
+                                    <i class="fas fa-wine-glass-alt"></i>
+                                    
+                                    {% endif %}
                                 </button>
                             </form>
                         </div>
@@ -132,13 +140,30 @@
                       {% if review.likes|length == 1 %}
                       <div class="outer">
                         <div class="inner">
-                            <p><a href="#">{{review.likes|length}}</a> user cheers'd this review</p>
+                            <p>
+                            <i class="fas fa-glass-cheers fa-sm"></i> 
+                            {% for like in review.likes %}
+                            <a href="/users/{{like.user.id}}">@{{like.user.username}}</a> cheers'd this review. 
+                            {% endfor %}
+                            </p>
                         </div>
                       </div>
                       {% else %}
                       <div class="outer">
                         <div class="inner">
-                            <p><a href="#">{{review.likes|length}}</a> users cheers'd this review </p>
+                            <p>
+                              <i class="fas fa-glass-cheers fa-sm"></i> 
+                            {% for like in review.likes %}
+                            {% if loop.last %}
+                            and <a href="/users/{{like.user.id}}">@{{like.user.username}}</a> cheers'd this review. 
+                            {% elif loop.index == review.likes|length -1 %}
+                            <a href="/users/{{like.user.id}}">@{{like.user.username}}</a>
+                            {% else %}
+                            <a href="/users/{{like.user.id}}">@{{like.user.username}}</a>,
+                            {% endif %}
+                            {% endfor %}
+                            </p>
+                            
                           </div>
                       </div>
                       {% endif %}

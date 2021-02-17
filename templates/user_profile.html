@@ -144,7 +144,13 @@
                                     btn-secondary
                                     {% endif %}
                                 ">Cheers
+                                    {% if review.id in likes %}
                                     <i class="fas fa-glass-cheers fa-lg"></i> 
+                                    {% else %}
+                                    <i class="fas fa-wine-glass-alt"></i>
+                                    <i class="fas fa-wine-glass-alt"></i>
+                                    
+                                    {% endif %}
                                 </button>
                             </form>
                         </div>
@@ -159,15 +165,33 @@
                       {% if review.likes|length == 1 %}
                       <div class="outer">
                         <div class="inner">
-                            <p><a href="#">{{review.likes|length}}</a> user cheers'd this review</p>
+                            <p>
+                            <i class="fas fa-glass-cheers fa-sm"></i> 
+                            {% for like in review.likes %}
+                            <a href="/users/{{like.user.id}}">@{{like.user.username}}</a> cheers'd this review. 
+                            {% endfor %}
+                            </p>
                         </div>
                       </div>
                       {% else %}
                       <div class="outer">
                         <div class="inner">
-                            <p><a href="#">{{review.likes|length}}</a> users cheers'd this review </p>
+                            <p>
+                              <i class="fas fa-glass-cheers fa-sm"></i> 
+                            {% for like in review.likes %}
+                            {% if loop.last %}
+                            and <a href="/users/{{like.user.id}}">@{{like.user.username}}</a> cheers'd this review. 
+                            {% elif loop.index == review.likes|length -1 %}
+                            <a href="/users/{{like.user.id}}">@{{like.user.username}}</a>
+                            {% else %}
+                            <a href="/users/{{like.user.id}}">@{{like.user.username}}</a>,
+                            {% endif %}
+                            {% endfor %}
+                            </p>
+                            
                           </div>
                       </div>
+
                       {% endif %}
                       {% endif %}
 

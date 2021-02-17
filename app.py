@@ -250,7 +250,17 @@ def users_show(user_id):
 
     form=CommentForm()
 
-    return render_template('user_profile.html', user=user, reviews=reviews, form=form)
+    comments=Comment.query.all()
+    likes=Likes.query.with_entities(Likes.reviews_id).filter(Likes.user_id == g.user.id).all()
+    result = [] 
+
+        # turn likes (list of tuples) into just a list
+    for t in likes: 
+        for x in t: 
+            result.append(x)
+
+
+    return render_template('user_profile.html', user=user, reviews=reviews, form=form, comments=comments, likes=result)
 
 @app.route('/users/edit', methods=["GET", "POST"])
 def edit_profile():

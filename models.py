@@ -51,6 +51,8 @@ class Likes(db.Model):
         nullable=False
     )
 
+    user=db.relationship("User")
+
     reviews_id=db.Column(
         db.Integer,
         db.ForeignKey('reviews.id', ondelete='CASCADE'),
@@ -241,7 +243,7 @@ class Review(db.Model):
     )
 
     review = db.Column(
-       db.String(200)
+       db.String(100)
     )
 
     timestamp = db.Column(
