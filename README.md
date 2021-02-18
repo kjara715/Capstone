@@ -16,12 +16,12 @@ Data is sourced from https://www.thecocktaildb.com/api.php, which currently cont
    
   -Reviews can be edited or deleted by the user who created the review
   -Users can comment or cheers (like) other users' or their own reviews
-  ## Technology Used
-  -Python
-  -Flask
-  -Flask-SQLAlchemy
-  -JavaScript
-  -JQuery
-  -Bootstrap
-  -Font Awesome
+## Technology Used
+Python,
+Flask,
+Flask-SQLAlchemy,
+JavaScript,
+JQuery,
+Bootstrap,
+Font Awesome
   
