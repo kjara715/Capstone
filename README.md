@@ -2,7 +2,7 @@
 
 HomeMixers is a web application that allows users to search for cocktail recipes by key terms or find a random cocktail recipe. 
  
-Data is sourced from https://www.thecocktaildb.com/api.php, which currently containes 612 unique drink recipes.
+Data is sourced from https://www.thecocktaildb.com/api.php, which currently contains 612 unique drink recipes.
 
 ## App Features
 - Users can search for drinks by key term in the search bar on the home page or get a random drink recipe by clicking on the "Find Random Recipe" button. 
@@ -23,5 +23,6 @@ Flask-SQLAlchemy,
 JavaScript,
 JQuery,
 Bootstrap,
-Font Awesome
+Font Awesome,
+WTForms
   
