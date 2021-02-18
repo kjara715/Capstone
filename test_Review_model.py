@@ -48,12 +48,14 @@ class ReviewModelTestCase(TestCase):
 
         self.d1id = 5555555
         d1=Drink(name="TestDrink", ingredients="[gin, tonic water]", instructions="Mix ingredients", image=None)
-
-        db.session.commit()
-
         d1.id=self.d1id
 
+        db.session.add(d1)
+
+
         db.session.commit()
+
+    
 
         self.d1=Drink.query.get(self.d1id)
 
@@ -65,7 +67,7 @@ class ReviewModelTestCase(TestCase):
         return res
 
     def test_review_model(self):
-        """Does basic model work?"""
+        """Does basic reviewl model work?"""
         
         r = Review(
             drink_id=self.d1id,
@@ -82,27 +84,95 @@ class ReviewModelTestCase(TestCase):
         self.assertEqual(len(self.u.reviews), 1)
         self.assertEqual(self.u.reviews[0].review, "Test Review")
 
-    # def test_message_likes(self):
-    #     m1 = Message(
-    #         text="a warble",
-    #         user_id=self.uid
-    #     )
+    def test_review_likes(self):
+        """Test liking a review"""
+        r1 =  Review(
+            drink_id=self.d1id,
+            rating= 3.5,
+            review="Test Review",
+            user_id=self.uid,
+            image= "https://images.unsplash.com/photo-1561150169-371f366b828a?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8YWxjb2hvbHxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80"
+        )
+         
 
-    #     m2 = Message(
-    #         text="a very interesting warble",
-    #         user_id=self.uid 
-    #     )
+        r2 = Review(
+            drink_id=self.d1id,
+            rating= 4.2,
+            review="Another Test Review of same drink",
+            user_id=self.uid,
+            image= "https://images.financialexpress.com/2018/03/beer-reuters.jpg"
+        )
+        u = User.signup("yetanothertest", "t@email.com", "password", None)
+        uid = 888
+        u.id = uid
+        db.session.add_all([r1, r2, u])
+        db.session.commit()
 
-    #     u = User.signup("yetanothertest", "t@email.com", "password", None)
-    #     uid = 888
-    #     u.id = uid
-    #     db.session.add_all([m1, m2, u])
-    #     db.session.commit()
+        u.likes.append(r1)
 
-    #     u.likes.append(m1)
+        db.session.commit()
 
-    #     db.session.commit()
+        l = Likes.query.filter(Likes.user_id == uid).all()
+        self.assertEqual(len(l), 1)
+        self.assertEqual(l[0].reviews_id, r1.id)
+        self.assertNotEqual(l[0].reviews_id, r2.id)
 
-    #     l = Likes.query.filter(Likes.user_id == uid).all()
-    #     self.assertEqual(len(l), 1)
-    #     self.assertEqual(l[0].message_id, m1.id)
+    def test_review_comments(self):
+        """Test commenting on a review"""
+
+        r1 =  Review(
+            drink_id=self.d1id,
+            rating= 3.5,
+            review="Test Review",
+            user_id=self.uid,
+            image= "https://images.unsplash.com/photo-1561150169-371f366b828a?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8YWxjb2hvbHxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80"
+        )
+
+        r2 =  Review(
+            drink_id=self.d1id,
+            rating= 3.3,
+            review="Another review",
+            user_id=self.uid,
+            image= "https://images.unsplash.com/photo-1561150169-371f366b828a?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8YWxjb2hvbHxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80"
+        )
+
+        r1.id=8888
+        r2.id=5599
+        db.session.add(r1)
+        db.session.add(r2)
+
+        db.session.commit()
+
+        c1 =  Comment(
+            user_id=self.uid,
+            reviews_id=r1.id,
+            text="Comment on r1"
+        )
+         
+
+        c2 = Comment(
+            user_id=self.uid,
+            reviews_id=r2.id,
+            text="Comment on r2"
+        )
+
+        db.session.add(c1)
+        db.session.add(c2)
+
+        db.session.commit()
+
+        comments = Comment.query.filter(Comment.user_id == self.uid).all()
+        self.assertEqual(len(comments), 2)
+
+        comment1=Comment.query.filter(Comment.reviews_id == r1.id).all()
+        self.assertEqual(len(comment1), 1)
+        self.assertEqual(comment1[0].reviews_id, r1.id)
+        self.assertEqual(comment1[0].text, "Comment on r1")
+        self.assertNotEqual(comment1[0].text, "Comment on r2")
+        # self.assertNotEqual(l[0].reviews_id, r2.id)
+
+        comment2=Comment.query.filter(Comment.reviews_id == r2.id).all()
+        self.assertEqual(len(comment2), 1)
+        self.assertEqual(comment2[0].reviews_id, r2.id)
+        self.assertEqual(comment2[0].text, "Comment on r2")
+        self.assertNotEqual(comment2[0].text, "Comment on r1")
