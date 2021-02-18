@@ -121,7 +121,7 @@ class User(db.Model):
     )
 
     bio = db.Column(
-        db.String(200),
+        db.String(120),
     )
 
     profile_img = db.Column(

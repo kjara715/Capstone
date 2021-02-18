@@ -9,19 +9,16 @@
   <img class="text-center" src="{{ user.profile_img }}" alt="Image for {{ user.username }}" id="profile-avatar">
   <div class="row full-width">
     <div class="container">
-      <div id="user-stats" class="row justify-content-center">
+      <div id="user-stats" class="row justify-content-center align-items-center">
         
         <div class="col-9">
-          <div class="text-center">
-            @{{user.username}}
-          </div>
           <ul class="user-stats nav nav-pills">
             
 
             <li class="stat">
               <p class="small"><b>Reviews</b></p>
               <h4 class="text-center">
-                <a href="/users/{{ user.id }}">{{ user.reviews | length }}</a>
+                <p>{{ user.reviews | length }}</p>
               </h4>
             </li>
             <br>
@@ -39,7 +36,7 @@
               </h4>
             </li>
             
-            <div class="ml-auto">
+            <div class="ml-auto align-items-center">
               {% if g.user.id == user.id %}
               <div class="outer">
                   <div class="inner">
@@ -48,24 +45,31 @@
                       <h4><a href="/users/{{user.id}}/saved">{{user.saved_recipes | length}}</a></h4>
                     </li>
                   </div>
-                  <div class="inner">
+                  <div class="inner align-items-center">
                     <a href="/users/edit" class="btn btn-secondary">Edit Profile</a>  
                   </div>
-                  <div class="inner">
+                  <div class="inner align-items-center">
                     <form method="POST" action="/users/delete" class="form-inline ">
                       <button class="btn btn-danger ml-2">Delete Profile</button>
                     </form>
                   </div>
               </div>
               {% elif g.user %}
+              <div class="outer align-items-center"></div>
               {% if g.user.is_following(user) %}
-              <form method="POST" action="/users/stop-following/{{ user.id }}">
-                <button class="btn btn-primary">Unfollow</button>
-              </form>
+              
+                <div class="inner">
+                  <form method="POST" action="/users/stop-following/{{ user.id }}">
+                    <button class="btn btn-primary">Unfollow</button>
+                  </form>
+                </div>
               {% else %}
-              <form method="POST" action="/users/follow/{{ user.id }}">
-                <button class="btn btn-outline-primary">Follow</button>
-              </form>
+              <div class="inner">
+                <form method="POST" action="/users/follow/{{ user.id }}">
+                  <button class="btn btn-outline-primary">Follow</button>
+                </form>
+              </div>
+            </div>
               {% endif %}
               {% endif %}
             </div>
@@ -77,8 +81,10 @@
   <br>
   <div class="row">
     <div class="col-sm-3 bio">
+      <div class="text-center">
+        <b>@{{user.username}}</b>
+      </div>
       {% if user.bio %}
-      <h6 class="text-center">Bio</h6>
       <p class="text-center">{{ user.bio }}</p>
       {% endif %}
     </div>
@@ -94,7 +100,7 @@
                     <img class="card-img-top" src="{{review.image}}" alt="Card image cap">
                     <div class="card-body">
                             
-                      <h5 class="card-title"><a href="/users/{{review.user.id}}"><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image">@{{review.user.username}}</a>'s review of {{review.drink.name}}</h5>
+                      <h5 class="card-title text-center">{{review.drink.name}}</h5>
                       <div class="outer">
                         <div class="inner">
                             <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>  
@@ -117,6 +123,11 @@
                         </div>
                         {% endif %}
                         
+                      </div>
+                      <div class="outer">
+                        <div class="inner">
+                          <span><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image"><a href="/users/{{review.user.id}}">@{{review.user.username}}</a>'s review</span>
+                        </div>
                       </div>
                 
                     <div class="review-area">

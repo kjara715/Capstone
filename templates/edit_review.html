@@ -8,13 +8,19 @@
       <h2 class="join-message form-heading text-center">Edit Your Review for <b>{{drink}}</b></h2>
       <form method="POST" id="user_form">
         {{ form.hidden_tag() }}
-
+        <!-- {{form.rating.label}} {{form.rating(min='0', max='5')}} -->
         {% for field in form if field.widget.input_type != 'hidden' and field.name != 'password' %}
+          {% if field == 'rating' %}
+          {{ field.label }}
+          {{field(min='0', max='5')}}
+          {% else %}
+          {{ field.label }}
+          {{ field(class="form-control") }}
           {% for error in field.errors %}
             <span class="text-danger">{{ error }}</span>
           {% endfor %}
-          {{ field.label }}
-          {{ field(class="form-control") }}
+          <br>
+          {% endif %}
         {% endfor %}
         <br>
         <div>

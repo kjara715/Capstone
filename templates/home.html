@@ -69,10 +69,10 @@
                     <img class="card-img-top" src="{{review.image}}" alt="Card image cap">
                     <div class="card-body">
                             
-                      <h5 class="card-title"><a href="/users/{{review.user.id}}"><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image">@{{review.user.username}}</a>'s review of {{review.drink.name}}</h5>
+                      <h5 class="card-title text-center">{{review.drink.name}}</h5>
                       <div class="outer">
                         <div class="inner">
-                            <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>  
+                            <span class="text-muted"><b>Posted on</b> {{ review.timestamp.strftime('%d %B %Y') }}</span>
                         </div>
                         {% if g.user.id == review.user.id %}
                         <div class="inner">
@@ -93,7 +93,11 @@
                         {% endif %}
                         
                       </div>
-                
+                      <div class="outer">
+                        <div class="inner">
+                          <span><img src="{{ review.user.profile_img }}" alt="user image" class="timeline-image"><a href="/users/{{review.user.id}}">@{{review.user.username}}</a>'s review</span>
+                        </div>
+                      </div>
                     <div class="review-area">
                         <hr>
                         <div class="d-flex justify-content-center">
@@ -188,18 +192,20 @@
                     {% for comment in comments %}
                         {% if review.id == comment.reviews_id %}
                         <hr>
+                        <!-- d-flex p-2 -->
                         <div class="d-flex p-2 bd-highlight bg-light align-items-center">
-                            {% if g.user.id == comment.user.id %}
-                            <div class="text-right">
-                                <form action="/users/{{comment.id}}/delete" method="POST">
-                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
-                                </form>  
-                            </div>
-                            {% endif %}
-                            <div class="d flex justify-content-center">
-                                <p><a href="/users/{{comment.user.id}}"> <img src="{{ comment.user.profile_img }}" alt="user image" class="timeline-image">@{{comment.user.username}}</a>: {{comment.text}}</p>
-                            </div> 
-                        </div>
+                          {% if g.user.id == comment.user.id %}
+                          <div class="text-right">
+                              <form action="/users/{{comment.id}}/delete" method="POST">
+                                  <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                              </form>  
+                          </div>
+                          {% endif %}
+                          <div class="pull-right">
+                              <p><a href="/users/{{comment.user.id}}"> <img src="{{ comment.user.profile_img }}" alt="user image" class="timeline-image">@{{comment.user.username}}</a>: {{comment.text}}</p>
+                          </div> 
+                          
+                      </div>
                         {% endif %}
                     {% endfor %}
                     </div>

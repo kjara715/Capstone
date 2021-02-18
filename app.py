@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
+from wtforms.fields.html5 import DecimalRangeField
 from forms import SignUp, LoginForm, ReviewForm, UserEditForm, CommentForm
 
 from models import User, Review, Drink, Saved_recipe, Likes, Follows, Comment, db, connect_db
@@ -520,7 +521,7 @@ def edit_review(review_id):
     if form.validate_on_submit():
            
 
-            review.rating=form.rating.data 
+            review.rating=round(float(form.rating.data),2)
             review.review=form.review.data 
             review.image=display_img
             
