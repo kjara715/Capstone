@@ -1,6 +1,6 @@
 # HomeMixers
 
-HomeMixers is a web application that allows users to search for cocktail recipes by key terms or find a random cocktail recipe. 
+HomeMixers is a web application that allows users to search for cocktail recipes by key terms or find a random cocktail recipe. Try it out here: https://homemixers.herokuapp.com/
  
 Data is sourced from https://www.thecocktaildb.com/api.php, which currently contains 612 unique drink recipes.
 
